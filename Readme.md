@@ -8,6 +8,13 @@ Aptos & Move integration:
   - Compile
   - Test
 
+## MODULES
+
+- Aptos Basics (Global Counter)
+- Aptos Coin
+
+---
+
 ## Setup
 
 ### Initialize
