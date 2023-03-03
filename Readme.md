@@ -15,7 +15,7 @@ Aptos & Move integration:
 
 ---
 
-## Setup
+## SETUP
 
 ### Initialize
 
@@ -50,3 +50,10 @@ aptos move compile --bytecode-version 6
 ```sh
 aptos move test --bytecode-version 6
 ```
+
+## Structs
+
+- `copy`: Allows values of types with this ability to be copied.
+- `drop`: Allows values of types with this ability to be popped/dropped.
+- `store`: Allows values of types with this ability to exist inside a struct in global storage.
+- `key`: Allows the type to serve as a key for global storage operations.
