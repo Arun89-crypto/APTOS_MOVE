@@ -57,3 +57,14 @@ aptos move test --bytecode-version 6
 - `drop`: Allows values of types with this ability to be popped/dropped.
 - `store`: Allows values of types with this ability to exist inside a struct in global storage.
 - `key`: Allows the type to serve as a key for global storage operations.
+
+## Specs
+
+The prover basically tells us that we need to explicitly specify the condition under which the function `balance_of` will abort, which is caused by calling the function `borrow_global` when `owner` does not own the resource `Balance<CoinType>`.
+
+```move
+spec balance_of {
+    pragma aborts_if_is_strict;
+    aborts_if !exists<Balance<CoinType>>(owner);
+}
+```

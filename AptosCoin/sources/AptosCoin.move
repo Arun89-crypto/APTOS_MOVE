@@ -32,6 +32,11 @@ module publisher::AptosCoin {
     public fun get_balance(addr: address): u64 acquires Balance {
         *&borrow_global<Balance>(addr).coin.value
     } 
+    // spec : get_balance
+    spec get_balance {
+        pragma aborts_if_is_strict;
+        aborts if !exists<Balance>(addr);
+    }
 
     public fun publish_balance(account: &signer) {
         let addr = signer::address_of(account);
@@ -45,6 +50,19 @@ module publisher::AptosCoin {
         let check = withdraw(signer_address, amount);
         deposit(to, check);
     }
+    // spec : transfer
+    spec transfer {
+        let addr_from = signer::address_of(from);
+        let balance_from = global<Balance>(addr_from).coin.value;
+
+        let balance_to = global<Balance>(to).coin.value;
+
+        let post balance_from_post = global<Balance>(addr_from).coin.value;
+        let post balance_to_post = global<Balance>(to).coin.value;
+
+        ensures balance_from_post == balance_from - amount;
+        ensures balance_to_post == balance_to + amount;
+    }
 
 
     // CORE FUNCS
@@ -56,6 +74,17 @@ module publisher::AptosCoin {
         let Coin { value } = check; 
         *balance_reference = _balance + value;
     }
+    // spec : deposit
+    spec deposit {
+        let balance = global<Balance>(addr).coin.value;
+        let check_value = check.value;
+
+        aborts_if !exists<Balance>(addr);
+        aborts_if balance + check_value > MAX_U64;
+
+        let post balance_post = global<Balance>(addr).coin.value;
+        ensures balance_post == balance + check_value;
+    }
 
     fun withdraw(addr: address, amount: u64): Coin acquires Balance {
         let _balance = get_balance(addr);
@@ -63,6 +92,17 @@ module publisher::AptosCoin {
         let balance_reference = &mut borrow_global_mut<Balance>(addr).coin.value;
         *balance_reference = _balance - amount;
         Coin {value: amount}
+    }
+    // spec : withdraw
+    spec withdraw {
+        let balance = global<Balance>(addr).coin.value;
+
+        aborts_if !exists<Balance>(addr);
+        aborts_if balance < amount;
+
+        let post balance_post = global<Balance>(addr).coin.value;
+        ensures result == Coin {value: amount};
+        ensures balance_post == balance - amount;
     }
 
 }
